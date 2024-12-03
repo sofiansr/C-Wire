@@ -14,13 +14,13 @@ typedef struct Station Station;
 
 struct Station {
     int id;
-    int capacity;
+    long capacity;
     int totalLoad;
     StationType type;
     Station* parent;
 } ;
 
-Station* createStation(int id, StationType type, Station* parent, int capacity, int load) {
+Station* createStation(int id, StationType type, Station* parent, long capacity, int load) {
     Station* station = malloc(sizeof(Station));
     if (station == NULL) {
         exit(1);
@@ -135,7 +135,7 @@ void affiche(Station* station) {
             break;
     }
     printf("id=%d ", station->id);
-    printf("cap=%d ", station->capacity);
+    printf("cap=%ld ", station->capacity);
     printf("tot=%d]\n", station->totalLoad);
 }
 
@@ -186,11 +186,12 @@ int main() {
         token = strtok(NULL, ";");
         int individual = atoi(token);
         token = strtok(NULL, ";");
-        int capacity = atoi(token);
+        long capacity = strtol(token, NULL, 10);
         token = strtok(NULL, ";");
         int load = atoi(token);
 
         if (load != 0) { // new client, so we fill the tree
+            printf("new client %d\n", load);
             station->totalLoad += load;
             Station* tmp = station->parent;
             while (tmp != NULL) {
@@ -219,7 +220,6 @@ int main() {
         
     }
     fclose(file);
-    //printTree(root);
 
     return 0;
 }
