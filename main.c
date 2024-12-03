@@ -1,20 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 
 typedef enum {
-    HV_A,
+    POWER_PLANT,
     HV_B,
+    HV_A,
     LV
 } StationType;
 
-typedef struct {
+typedef struct Station Station;
+
+struct Station {
     int id;
     int capacity;
     int totalLoad;
     StationType type;
     Station* parent;
-} Station;
+} ;
 
 Station* createStation(int id, StationType type, Station* parent, int capacity, int load) {
     Station* station = malloc(sizeof(Station));
@@ -68,22 +72,67 @@ Node* insertAvl(Node* root, Station* station, int* h) {
         if (new->balance == 0) *h = 0;
         else *h = 1;
     }
+    return root;
 }
 
-Station* find(Node* root, int id, StationType type) {
-    if (root == NULL) return NULL;
-    if (root->station->id == id) return root->station;
-    if (id < root->station->id) {
-        return find(root->leftChild, id);
-    }
-    return find(root->rightChild, id);
+typedef struct Cell Cell;
+struct Cell {
+    Cell* next;
+    Station* station;
+};
+
+Cell* newCell(Station* station) {
+    Cell* c = malloc(sizeof(Cell));
+    if (c == NULL) exit(1);
+    c->next = NULL;
+    c->station = station;
+    return c;
 }
 
+typedef struct {
+    Cell* deb;
+    Cell* fin;
+} File;
 
+File* enfile(File* file, Station* station) {
+    if (file == NULL) return NULL;
+    Cell* cell = newCell(station);
+    if (file->fin != NULL) file->fin->next = cell;
+    file->fin = cell;
+    if (file->deb == NULL) file->deb = cell;
+    return file;
+}
+
+Station* defile(File* file) {
+    if (file == NULL) return NULL;
+    Cell* cell = file->deb;
+    if (cell == NULL) return NULL;
+
+    Station* station = cell->station;
+    file->deb = cell->next;
+    if (file->deb == NULL) file->fin = NULL;
+    free(cell);
+    return station;
+}
+
+void affiche(Station* station) {
+    if (station == NULL) return;
+    printf("%d", station->id);
+}
 
 // fonction parcours largeur
-
-
+void printTree(Node* root) {
+    if (root == NULL) return;
+    File* file = malloc(sizeof(File));
+    if (file == NULL) exit(1);
+    enfile(file, root->station);
+    while (file->deb != NULL) {
+        affiche(defile(file));
+        if (root->leftChild != NULL) enfile(file, root->leftChild->station);
+        if (root->rightChild != NULL) enfile(file, root->rightChild->station);
+    }
+    free(file);
+}
 
 
 int main() {
@@ -99,32 +148,53 @@ int main() {
         char line[100];
         if (fgets(line, 100, file) == NULL) break;
 
-        // TODO: revoir les tokens et le capacity
         char* token = strtok(line, ";");
-        int powerPlantId = atoi(token);
-
+        int power_plant = atoi(token);
         token = strtok(NULL, ";");
         int hv_b = atoi(token);
         token = strtok(NULL, ";");
         int hv_a = atoi(token);
         token = strtok(NULL, ";");
         int lv = atoi(token);
-
+        token = strtok(NULL, ";");
+        int company = atoi(token);
+        token = strtok(NULL, ";");
+        int individual = atoi(token);
+        token = strtok(NULL, ";");
+        int capacity = atoi(token);
         token = strtok(NULL, ";");
         int load = atoi(token);
-        if (capacity != 0) {  // new station
-            station = createStation(id, capacity, load);
-            root = insertAvl(root, station, &h);
-        } else if (load != 0) { // new client 
+
+        if (load != 0) { // new client, so we fill the tree
             station->totalLoad += load;
             Station* tmp = station->parent;
             while (tmp != NULL) {
                 tmp->totalLoad += load;
                 tmp = tmp->parent;
             }
+            continue;
         }
+
+        if (capacity != 0) {  // new station
+            if (lv != 0) {
+                station = createStation(lv, LV, station, capacity, load);
+            } else if (hv_a != 0) {
+                station = createStation(hv_a, HV_A, station, capacity, load);
+            } else if (hv_b != 0) {
+                station = createStation(hv_b, HV_B, station, capacity, load);
+            } else if (power_plant != 0) {
+                station = createStation(power_plant, POWER_PLANT, station, capacity, load);
+            } else {
+                // TODO: handle error
+                exit(2);
+            }
+            root = insertAvl(root, station, &h);
+        }
+        
     }
     fclose(file);
+    affiche(root->leftChild->station);
+    //printTree(root);
 
     return 0;
 }
