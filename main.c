@@ -78,14 +78,14 @@ Node* insertAvl(Node* root, Station* station, int* h) {
 typedef struct Cell Cell;
 struct Cell {
     Cell* next;
-    Station* station;
+    Node* node;
 };
 
-Cell* newCell(Station* station) {
+Cell* newCell(Node* node) {
     Cell* c = malloc(sizeof(Cell));
     if (c == NULL) exit(1);
     c->next = NULL;
-    c->station = station;
+    c->node = node;
     return c;
 }
 
@@ -94,30 +94,49 @@ typedef struct {
     Cell* fin;
 } File;
 
-File* enfile(File* file, Station* station) {
+File* enfile(File* file, Node* node) {
     if (file == NULL) return NULL;
-    Cell* cell = newCell(station);
+    Cell* cell = newCell(node);
     if (file->fin != NULL) file->fin->next = cell;
     file->fin = cell;
     if (file->deb == NULL) file->deb = cell;
     return file;
 }
 
-Station* defile(File* file) {
+Node* defile(File* file) {
     if (file == NULL) return NULL;
     Cell* cell = file->deb;
     if (cell == NULL) return NULL;
 
-    Station* station = cell->station;
+    Node* node = cell->node;
     file->deb = cell->next;
     if (file->deb == NULL) file->fin = NULL;
     free(cell);
-    return station;
+    return node;
 }
 
 void affiche(Station* station) {
     if (station == NULL) return;
-    printf("%d", station->id);
+    printf("[");
+    switch (station->type) {
+        case POWER_PLANT:
+            printf("Power plant ");
+            break;
+        case HV_B:
+            printf("HV-B Station ");
+            break;
+        case HV_A:
+            printf("HV-A Station ");
+            break;
+        case LV:
+            printf("LV Station ");
+            break;
+        default:
+            break;
+    }
+    printf("id=%d ", station->id);
+    printf("cap=%d ", station->capacity);
+    printf("tot=%d]\n", station->totalLoad);
 }
 
 // fonction parcours largeur
@@ -125,11 +144,17 @@ void printTree(Node* root) {
     if (root == NULL) return;
     File* file = malloc(sizeof(File));
     if (file == NULL) exit(1);
-    enfile(file, root->station);
+
+    enfile(file, root);
     while (file->deb != NULL) {
-        affiche(defile(file));
-        if (root->leftChild != NULL) enfile(file, root->leftChild->station);
-        if (root->rightChild != NULL) enfile(file, root->rightChild->station);
+        Node* node = defile(file);
+        affiche(node->station);
+        if (node->leftChild != NULL) {
+            enfile(file, node->leftChild);
+        }
+        if (node->rightChild != NULL) {
+            enfile(file, node->rightChild);
+        }
     }
     free(file);
 }
@@ -188,12 +213,12 @@ int main() {
                 // TODO: handle error
                 exit(2);
             }
+            affiche(station);
             root = insertAvl(root, station, &h);
         }
         
     }
     fclose(file);
-    affiche(root->leftChild->station);
     //printTree(root);
 
     return 0;
