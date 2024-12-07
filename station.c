@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "station.h"
 
-Station* createStation(int id, long capacity, long load) {
+Station* createStation(unsigned long id, unsigned long long capacity, unsigned long long load) {
     Station* station = malloc(sizeof(Station));
     if (station == NULL) {
         exit(1);
