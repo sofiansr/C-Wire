@@ -14,8 +14,8 @@ Station* createStation(int id, long capacity, long load) {
 void printStation(Station* station) {
     if (station == NULL) return;
     printf("[");
-    printf("id=%d ", station->id);
-    printf("cap=%ld ", station->capacity);
-    printf("tot=%d", station->totalLoad);
+    printf("id=%lu ", station->id);
+    printf("cap=%llu ", station->capacity);
+    printf("tot=%llu", station->totalLoad);
     printf("]\n");
 }
