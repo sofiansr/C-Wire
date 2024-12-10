@@ -17,10 +17,10 @@ Node* insertStation(Node* root, Station* station, int* h) {
         *h = 1;
         return new;
     }
-    if (station->capacity < root->station->capacity) {
+    if (station->id < root->station->id) {
         root->leftChild = insertStation(root->leftChild, station, h);
         *h = -*h;
-    } else if (station->capacity > root->station->capacity) {
+    } else if (station->id > root->station->id) {
         root->rightChild = insertStation(root->rightChild, station, h);
     } else {
         *h = 0;
@@ -35,6 +35,16 @@ Node* insertStation(Node* root, Station* station, int* h) {
     return root;
 }
 
+Station* findStation(Node* root, unsigned long id) {
+    if (root == NULL) return NULL;
+    if (root->station->id == id) {
+        return root->station;
+    }
+    if (root->station->id < id) {
+        return findStation(root->rightChild, id);
+    }
+    return findStation(root->leftChild, id);
+}
 void printTree(Node* root) {
     if (root == NULL) return;
     printTree(root->leftChild);

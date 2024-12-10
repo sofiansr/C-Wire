@@ -10,14 +10,18 @@ int main() {
         return 1;
     }
     int h = 0;
-    Node* root = NULL;
     Station* station = NULL;
+    Node* hvbNode = NULL;
+    Node* hvaNode = NULL;
+    Node* lvNode = NULL;
+
     while (1) {
         char line[100];
         if (fgets(line, 100, file) == NULL) break;
 
         char* token = strtok(line, ";");
-        unsigned long power_plant = atoi(token); // 5 centrales
+        unsigned long power_plant = strtoul(token, NULL, 10); // 5 centrales
+        if (power_plant == 0) continue;
         token = strtok(NULL, ";");
         unsigned long hvbId = strtoul(token, NULL, 10); // ~118 sous-stations HV-B
         token = strtok(NULL, ";");
@@ -34,16 +38,28 @@ int main() {
         token = strtok(NULL, ";");
         unsigned long long load = strtoull(token, NULL, 10);
 
-        if (load != 0) { // new client, so we fill the tree
-            printf("new client %llu\n", load);
-            // TODO
-
-        }
-
-        if (capacity != 0) {  // new station
-            // TODO
-        }
-        
+        int h = 0;
+        Station* st;
+        if (lvId != 0) {
+            st = findStation(lvNode, lvId);
+            if (st == NULL) {
+                st = createStation(lvId, capacity, load);
+                lvNode = insertStation(lvNode, st, &h);
+            }
+        } else if (hvaId != 0) {
+            st = findStation(hvaNode, hvaId);
+            if (st == NULL) {
+                st = createStation(hvaId, capacity, load);
+                hvaNode = insertStation(hvaNode, st, &h);
+            }
+        } else if (hvbId != 0) {
+            st = findStation(hvbNode, hvbId);
+            if (st == NULL) {
+                st = createStation(hvbId, capacity, load);
+                hvbNode = insertStation(hvbNode, st, &h);
+            }
+        } else continue; // power plant
+        st->totalLoad += load;
     }
     fclose(file);
 
