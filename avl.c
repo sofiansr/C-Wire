@@ -18,10 +18,10 @@ Node* insertStation(Node* root, Station* station, int* h) {
         return new;
     }
     if (station->capacity < root->station->capacity) {
-        root->leftChild = insertAvl(root->leftChild, station, h);
+        root->leftChild = insertStation(root->leftChild, station, h);
         *h = -*h;
     } else if (station->capacity > root->station->capacity) {
-        root->rightChild = insertAvl(root->rightChild, station, h);
+        root->rightChild = insertStation(root->rightChild, station, h);
     } else {
         *h = 0;
         return root;

@@ -17,25 +17,25 @@ int main() {
         if (fgets(line, 100, file) == NULL) break;
 
         char* token = strtok(line, ";");
-        int power_plant = atoi(token); // 5 centrales
+        unsigned long power_plant = atoi(token); // 5 centrales
         token = strtok(NULL, ";");
-        int hvbId = atoi(token); // ~118 sous-stations HV-B
+        unsigned long hvbId = strtoul(token, NULL, 10); // ~118 sous-stations HV-B
         token = strtok(NULL, ";");
-        int hvaId = atoi(token); // ~512 sous-stations HV-A
+        unsigned long hvaId = strtoul(token, NULL, 10); // ~512 sous-stations HV-A
         token = strtok(NULL, ";");
-        unsigned long lvId = atoi(token); // +180k postes LV
+        unsigned long lvId = strtoul(token, NULL, 10); // +180k postes LV
         token = strtok(NULL, ";");
-        unsigned long companyId = stoul(token); // +1.25M consommateurs (entreprises)
+        unsigned long companyId = strtoul(token, NULL, 10); // +1.25M consommateurs (entreprises)
         token = strtok(NULL, ";");
-        unsigned long long individualId = stoull(token); // +7.6M   consommateurs (particuliers)
+        unsigned long long individualId = strtoull(token, NULL, 10); // +7.6M   consommateurs (particuliers)
         token = strtok(NULL, ";");
 
-        unsigned long long capacity = stoull(token, NULL, 10);
+        unsigned long long capacity = strtoull(token, NULL, 10);
         token = strtok(NULL, ";");
-        unsigned long long load = stoull(token, NULL, 10);
+        unsigned long long load = strtoull(token, NULL, 10);
 
         if (load != 0) { // new client, so we fill the tree
-            printf("new client %d\n", load);
+            printf("new client %llu\n", load);
             // TODO
 
         }
