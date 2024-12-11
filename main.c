@@ -3,7 +3,16 @@
 #include <string.h>
 #include "avl.h"
 
-int main() {
+int main(int argc, char** argv) {
+    // argc[0] = chemin du fichier
+    // argc[1] = type de station
+    // argc[2] = type de consommateur
+    // argc[3] = id_centrale (optionnel)
+
+    if (argc < 3) {
+        exit(1);
+    }
+
     FILE* file = fopen("c-wire_v00.dat", "r");
     if (file == NULL) {
         printf("Error opening file\n");
