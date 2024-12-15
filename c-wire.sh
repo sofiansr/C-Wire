@@ -45,35 +45,34 @@ helpexit(){
 for arg in "$@"
 do
     if [ "$arg" == "-h" ]; then
-        echo "pomme"
-        helpexit()
+        helpexit
     fi
 done
 
 if [ $# -eq 0 ]
 then
     echo "Aucun argument passé en paramètre"
-    helpexit()
+    helpexit
 fi
 
 # test non vide
-if [ -s $file ]
+if [ -s $file_path ]
 then
     :
 else
-    echo "fichier $file vide"
-    helpexit()
+    echo "fichier "$file_path" vide"
+    helpexit
 fi
 
 
 
 # test perm lecture
-if [ -r $file ]
+if [ -r $file_path ]
 then
     :
 else
-    echo "pas d'acces en lecture au fichier $file"
-    helpexit()
+    echo "pas d'acces en lecture au fichier "$file_path""
+    helpexit
 fi
 
 # rappel, 3 arguments (4)
@@ -94,7 +93,7 @@ then
     if (( $id_centrale <= 0 ))
     then
         echo "id_centrale <= 0 : incorrect"
-        helpexit()
+        helpexit
     fi
 fi
 
@@ -103,22 +102,22 @@ if [ -e $file_path ]
 then
     :
 else
-    echo "fichier "$file" non présent dans le dossier courant"
-    helpexit()
+    echo "fichier "$file_path" non présent dans le dossier courant"
+    helpexit
 fi
 
 # check arg 2
-if [ "$type_station" != "hvb" ] || [ "$type_station" != "hva" ] || [ "$type_station" != "lv" ]
+if [ "$type_station" != "hvb" ] && [ "$type_station" != "hva" ] && [ "$type_station" != "lv" ]
 then
     echo ""$1" est un mauvais argument pour le deuxieme argument (hvb/hva/lv)"
-    helpexit()
+    helpexit
 fi
 
 # check arg 3
-if [ "$type_consommateur" != "comp" ] || [ "$type_consommateur" != "indiv" ] || [ "$type_consommateur" != "all" ]
+if [ "$type_consommateur" != "comp" ] && [ "$type_consommateur" != "indiv" ] && [ "$type_consommateur" != "all" ]
 then
     echo ""$2" est un mauvais argument pour le troisieme argument (comp/indiv/all)"
-    helpexit()
+    helpexit
 fi
 
 # useless et faux
@@ -142,7 +141,7 @@ if [[ ( "$type_station" == "hvb" || "$type_station" == "hva" ) &&
       ( "$type_consommateur" == "all" || "$type_consommateur" == "indiv" ) ]]
 then
     echo "argument "$type_station" et argument "$type_consommateur" incompatible"
-    helpexit()
+    helpexit
 fi
 
 # check arg 3 : si id_centrale <= 0 ou n'est pas déclaré (si non renseigné)
@@ -160,7 +159,7 @@ then
 else
     if make
     then
-        :
+        make clean
     else
         echo "compilation error"
         exit 1
@@ -184,6 +183,8 @@ fi
 start_time=$(date +%s)
 
 #TODO : echo rappel de la commande demandee
+echo "RAPPEL filtrage demande : "$type_station" "$type_consommateur""
+
 echo "debut filtrage : veuillez patienter"
 
 # if [ "$type_station" == "" ]
