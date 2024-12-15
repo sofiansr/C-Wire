@@ -170,7 +170,7 @@ fi
 # verif dossier tmp existe, le creer sinon, et le vider s'il existe deja
 if [ -d "tmp" ]
 then
-    rm tmp
+    rm -rf tmp
     mkdir tmp
 else
     mkdir tmp
@@ -188,28 +188,41 @@ echo "debut filtrage : veuillez patienter"
 
 # if [ "$type_station" == "" ]
 
-# awk -F ";" 
+# awk -F ';' 
 # doc awk : https://www.funix.org/fr/unix/awk.htm
+
+# Lorsque le script demande un type de station (hvb, hva, lv), le but final
+# sera de créer un fichier contenant une liste de ces stations avec la valeur
+# de capacité (la quantité d’énergie qu’elle peut laisser passer) et la somme
+# des consommateurs branchés directement dessus.
+
+# (conso) || (capacite)
 
 case $type_station in
     hvb)
         if [ -z "$id_centrale" ]
         then
             # COMP sans id_centrale
-            awk -F ";"
+            # conso : awk -F ';' '$2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+            # capacite : awk -F ';' '$2 != "-" && $3 == "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"' "$file_path" > "tmp/tmp.dat"
+            awk -F ';' '($2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 != "-" && $3 == "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
         else
             # COMP avec id_centrale
-            awk -F ";"
+            # awk -F ';' -v id="$id_centrale" '$1 == id && $2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+            awk -F ';' -v id="$id_centrale" '$1 == id && (($2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 != "-" && $3 == "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
         fi
         ;;
     hva)
         if [ -z "$id_centrale" ]
         then
             # COMP sans id_centrale
-            awk -F ";"
+            # awk -F ';' '$3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+            # awk -F ';' '$3 != "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"' "$file_path" > "tmp/tmp.dat"
+            awk -F ';' '($3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($3 != "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
         else
             # COMP avec id_centrale
-            awk -F ";"
+            # awk -F ';' -v id="$id_centrale" '$1 == id && $3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+            awk -F ';' -v id="$id_centrale" '$1 == id && (($3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($3 != "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
         fi
         ;;
     lv)
@@ -218,30 +231,37 @@ case $type_station in
                 if [ -z "$id_centrale" ]
                 then
                     # COMP sans id_centrale
-                    awk -F ";"
+                    # awk -F ';' '$2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    # awk -F ';' '$2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-"' "$file_path" > "tmp/tmp.dat"
+                    awk -F ';' '($2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
                 else
                     # COMP avec id_centrale
-                    awk -F ";"
+                    # awk -F ';' -v id="$id_centrale" '$1 == id && $2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    awk -F ';' -v id="$id_centrale" '$1 == id && (($2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
                 fi
                 ;;
             indiv)
                 if [ -z "$id_centrale" ]
                 then
                     # INDIV sans id_centrale
-                    awk -F ";"
+                    # awk -F ';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    awk -F ';' '($2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
                 else
                     # INDIV avec id_centrale
-                    awk -F ";"
+                    # awk -F ';' -v id="$id_centrale" '$1 == id && $2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    awk -F ';' -v id="$id_centrale" '$1 == id && (($2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
                 fi
                 ;;
             all)
                 if [ -z "$id_centrale" ]
                 then
                     # ALL sans id_centrale
-                    awk -F ";"
+                    # awk -F ';' '$2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    awk -F ';' '($2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
                 else
                     # ALL avec id_centrale
-                    awk -F ";"
+                    # awk -F ';' -v id="$id_centrale" '$1 == id && $2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    awk -F ';' -v id="$id_centrale" '$1 == id && (($2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
                 fi
                 ;;
             *)
