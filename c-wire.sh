@@ -2,19 +2,58 @@
 
 #file='c-wire_v00.dat'
 
+# affiche l'aide si demandé ou si args incorrects puis exit
+helpexit(){
+    message="
+    _____       _    _ ___________ _____ 
+    /  __ \     | |  | |_   _| ___ \  ___|
+    | /  \/_____| |  | | | | | |_/ / |__  
+    | |  |______| |/\| | | | |    /|  __| 
+    | \__/\     \  /\  /_| |_| |\ \| |___ 
+    \____/      \/  \/ \___/\_| \_\____/                  
+    
+    C-WIRE HELP :
+
+    C-Wire is a command-line script that sort your electricity distribution system by station type and user type.
+    Results are sorted by capacity and electricity consumption.
+
+    ARG 1 : DATA FILE PATH (.dat)
+    ARG 2 : STATION TYPE (hvb, hva, lv)
+    ARG 3 : USER TYPE (comp, indiv, all)
+    ARG 4 (optional) : PLANT ID (int)
+    
+    ARG 4 will filter results by the PLANT ID you mentioned
+
+    USAGE :
+    ./c-wire.sh [ARG1] [ARG2] [ARG3] [ARG4]
+
+    -h : Trigger this help message
+
+    NOTE : hvb all, hvb indiv, hva all, hva indiv are forbidden commands
+
+
+
+    C-WIRE
+    ALL RIGHTS RESERVED 2024-2024
+    MIT LICENSE    
+    "
+    echo "$message"
+    exit 1
+}
+
 # Vérifier si l'un des paramètres est -h
 for arg in "$@"
 do
     if [ "$arg" == "-h" ]; then
         echo "pomme"
-        exit 0
+        helpexit()
     fi
 done
 
-if [$# -eq 0]
+if [ $# -eq 0 ]
 then
     echo "Aucun argument passé en paramètre"
-    exit 1
+    helpexit()
 fi
 
 # test non vide
@@ -23,7 +62,7 @@ then
     :
 else
     echo "fichier $file vide"
-    exit 1
+    helpexit()
 fi
 
 
@@ -34,7 +73,7 @@ then
     :
 else
     echo "pas d'acces en lecture au fichier $file"
-    exit 1
+    helpexit()
 fi
 
 # rappel, 3 arguments (4)
@@ -55,31 +94,31 @@ then
     if (( $id_centrale <= 0 ))
     then
         echo "id_centrale <= 0 : incorrect"
-        exit 1
+        helpexit()
     fi
 fi
 
-# cehck arg 1 : file existe dans dossier courant ?
+# check arg 1 : file existe dans dossier courant ?
 if [ -e $file_path ]
 then
     :
 else
     echo "fichier "$file" non présent dans le dossier courant"
-    exit 1
+    helpexit()
 fi
 
 # check arg 2
 if [ "$type_station" != "hvb" ] || [ "$type_station" != "hva" ] || [ "$type_station" != "lv" ]
 then
     echo ""$1" est un mauvais argument pour le deuxieme argument (hvb/hva/lv)"
-    exit 1
+    helpexit()
 fi
 
 # check arg 3
 if [ "$type_consommateur" != "comp" ] || [ "$type_consommateur" != "indiv" ] || [ "$type_consommateur" != "all" ]
 then
     echo ""$2" est un mauvais argument pour le troisieme argument (comp/indiv/all)"
-    exit 1
+    helpexit()
 fi
 
 # useless et faux
@@ -103,19 +142,125 @@ if [[ ( "$type_station" == "hvb" || "$type_station" == "hva" ) &&
       ( "$type_consommateur" == "all" || "$type_consommateur" == "indiv" ) ]]
 then
     echo "argument "$type_station" et argument "$type_consommateur" incompatible"
-    exit 1
+    helpexit()
 fi
 
-# check arg 3 : si id_central <= 0 ou n'est pas déclaré (si non renseigné)
+# check arg 3 : si id_centrale <= 0 ou n'est pas déclaré (si non renseigné)
 #if [ $id_centrale -lt 0 ] || [ -z "$id_centrale" ]
 #then
 #    echo "parametre id_centrale incorrect ou vide"
 #    exit 1
 #fi
 
-# EXECUTABLE NON PRESENT DANS DOSSIER COURANT
+# EXECUTABLE NON PRESENT DANS DOSSIER COURANT :
+# make renvoie 0 si ok, autre chose sinon
 if [ -e "main.c" ]
 then
     :
 else
-    make
+    if make
+    then
+        :
+    else
+        echo "compilation error"
+        exit 1
+    fi
+fi
+
+# verif dossier tmp existe, le creer sinon, et le vider s'il existe deja
+if [ -d "tmp" ]
+then
+    rm tmp
+    mkdir tmp
+else
+    mkdir tmp
+fi
+
+
+
+
+# le filtrage est chronometre : le code du filtrage est entre start_time et end_time
+
+start_time=$(date +%s)
+
+#TODO : echo rappel de la commande demandee
+echo "debut filtrage : veuillez patienter"
+
+# if [ "$type_station" == "" ]
+
+# awk -F ";" 
+# doc awk : https://www.funix.org/fr/unix/awk.htm
+
+case $type_station in
+    hvb)
+        if [ -z "$id_centrale" ]
+        then
+            # COMP sans id_centrale
+            awk -F ";"
+        else
+            # COMP avec id_centrale
+            awk -F ";"
+        fi
+        ;;
+    hva)
+        if [ -z "$id_centrale" ]
+        then
+            # COMP sans id_centrale
+            awk -F ";"
+        else
+            # COMP avec id_centrale
+            awk -F ";"
+        fi
+        ;;
+    lv)
+        case $type_consommateur in
+            comp)
+                if [ -z "$id_centrale" ]
+                then
+                    # COMP sans id_centrale
+                    awk -F ";"
+                else
+                    # COMP avec id_centrale
+                    awk -F ";"
+                fi
+                ;;
+            indiv)
+                if [ -z "$id_centrale" ]
+                then
+                    # INDIV sans id_centrale
+                    awk -F ";"
+                else
+                    # INDIV avec id_centrale
+                    awk -F ";"
+                fi
+                ;;
+            all)
+                if [ -z "$id_centrale" ]
+                then
+                    # ALL sans id_centrale
+                    awk -F ";"
+                else
+                    # ALL avec id_centrale
+                    awk -F ";"
+                fi
+                ;;
+            *)
+                # en theorie on arrive jamais ici
+                ;;
+        esac
+        ;;
+    *)
+        # idem
+        ;;
+esac
+
+
+
+
+
+
+
+end_time=$(date +%s)
+
+elapsed=$((end_time - start_time))
+echo "Temps écoulé : $elapsed secondes"
