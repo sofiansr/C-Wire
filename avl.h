@@ -14,5 +14,6 @@ Node* createNode(Station* station);
 Node* insertStation(Node* root, Station* station, int* h);
 Station* findStation(Node* root, unsigned long id);
 void printTree(Node* root);
+void freeFullAvl(Node* root);
 
 #endif /* AVL_H */

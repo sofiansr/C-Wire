@@ -20,7 +20,7 @@ helpexit(){
     ARG 1 : DATA FILE PATH (.dat)
     ARG 2 : STATION TYPE (hvb, hva, lv)
     ARG 3 : USER TYPE (comp, indiv, all)
-    ARG 4 (optional) : PLANT ID (int)
+    ARG 4 (optional) : PLANT ID (int >0)
     
     ARG 4 will filter results by the PLANT ID you mentioned
 
@@ -49,31 +49,9 @@ do
     fi
 done
 
-if [ $# -eq 0 ]
-then
-    echo "Aucun argument passé en paramètre"
-    helpexit
-fi
-
-# test non vide
-if [ -s $file_path ]
-then
-    :
-else
-    echo "fichier "$file_path" vide"
-    helpexit
-fi
 
 
-
-# test perm lecture
-if [ -r $file_path ]
-then
-    :
-else
-    echo "pas d'acces en lecture au fichier "$file_path""
-    helpexit
-fi
+# ----------- ROBUSTESSE -----------
 
 # rappel, 3 arguments (4)
 # arg 1 : file_path = chemin du fichier
@@ -81,10 +59,51 @@ fi
 # arg 3 : type_consommateur = type consommateur (=comp/indiv/all)
 # (arg 4 : id_centrale = filtre les résultats pour une centrale spécifique (>=1))
 
+if [ $# -eq 0 ]
+then
+    echo "Aucun argument passé en paramètre"
+    helpexit
+fi
+
 # récupération des arguments :
 file_path=$1
 type_station=$2
 type_consommateur=$3
+
+# check arg 1 : file existe dans dossier courant ?
+if [ ! -e $file_path ]
+then
+    echo "fichier "$file_path" non présent dans le dossier courant"
+    helpexit
+fi
+
+# test fichier vide
+if [ ! -s "$file_path" ]
+then
+    echo "fichier "$file_path" vide"
+    helpexit
+fi
+
+# test perm lecture
+if [ ! -r $file_path ]
+then
+    echo "pas d'acces en lecture au fichier "$file_path""
+    helpexit
+fi
+
+# check arg 2
+if [ "$type_station" != "hvb" ] && [ "$type_station" != "hva" ] && [ "$type_station" != "lv" ]
+then
+    echo ""$type_station" est un mauvais argument pour le deuxieme argument (hvb/hva/lv)"
+    helpexit
+fi
+
+# check arg 3
+if [ "$type_consommateur" != "comp" ] && [ "$type_consommateur" != "indiv" ] && [ "$type_consommateur" != "all" ]
+then
+    echo ""$type_consommateur" est un mauvais argument pour le troisieme argument (comp/indiv/all)"
+    helpexit
+fi
 
 # verif si 4 arguments pour attrib id_centrale
 if [ $# -eq 4 ]
@@ -97,45 +116,6 @@ then
     fi
 fi
 
-# check arg 1 : file existe dans dossier courant ?
-if [ -e $file_path ]
-then
-    :
-else
-    echo "fichier "$file_path" non présent dans le dossier courant"
-    helpexit
-fi
-
-# check arg 2
-if [ "$type_station" != "hvb" ] && [ "$type_station" != "hva" ] && [ "$type_station" != "lv" ]
-then
-    echo ""$1" est un mauvais argument pour le deuxieme argument (hvb/hva/lv)"
-    helpexit
-fi
-
-# check arg 3
-if [ "$type_consommateur" != "comp" ] && [ "$type_consommateur" != "indiv" ] && [ "$type_consommateur" != "all" ]
-then
-    echo ""$2" est un mauvais argument pour le troisieme argument (comp/indiv/all)"
-    helpexit
-fi
-
-# useless et faux
-# if [ ("$type_station" == "hvb" || "$type_station" == "hva") && ("$type_consommateur" == "all"  || "$type_consommateur" == "indiv")]
-# then
-#     echo "argument "$type_station" et argument "all" incompatible"
-#     exit 1
-# fi
-
-# if ( [ "$type_station" == "hvb" ] && [ "$type_consommateur" == "all" ] ) ||
-#    ( [ "$type_station" == "hvb" ] && [ "$type_consommateur" == "indiv" ] ) ||
-#    ( [ "$type_station" == "hva" ] && [ "$type_consommateur" == "all" ] ) ||
-#    ( [ "$type_station" == "hvb" ] && [ "$type_consommateur" == "indiv" ] )
-# then
-#     echo "argument "$type_station" et argument "$type_consommateur" incompatible"
-#     exit 1
-# fi
-
 # vérif des cas interdits arg 2 et 3
 if [[ ( "$type_station" == "hvb" || "$type_station" == "hva" ) && 
       ( "$type_consommateur" == "all" || "$type_consommateur" == "indiv" ) ]]
@@ -145,18 +125,19 @@ then
 fi
 
 # check arg 3 : si id_centrale <= 0 ou n'est pas déclaré (si non renseigné)
-#if [ $id_centrale -lt 0 ] || [ -z "$id_centrale" ]
-#then
-#    echo "parametre id_centrale incorrect ou vide"
-#    exit 1
-#fi
+if [ -n $id_centrale ] && [ $id_centrale -le 0 ]
+then
+    echo ""$id_centrale" <=0 non autorise"
+    helpexit
+fi
+
+
+# ----------- COMPILATION & DOSSIERS -----------
 
 # EXECUTABLE NON PRESENT DANS DOSSIER COURANT :
 # make renvoie 0 si ok, autre chose sinon
-if [ -e "main.c" ]
+if [ ! -e "main" ]
 then
-    :
-else
     if make
     then
         make clean
@@ -177,12 +158,12 @@ fi
 
 
 
+# ----------- FILTRAGE -----------
 
 # le filtrage est chronometre : le code du filtrage est entre start_time et end_time
 
 start_time=$(date +%s)
 
-#TODO : echo rappel de la commande demandee
 echo "RAPPEL filtrage demande : "$type_station" "$type_consommateur""
 
 echo "debut filtrage : veuillez patienter"
@@ -277,11 +258,15 @@ esac
 
 
 
+# ----------- TRAITEMENT -----------
 
+./main "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
+# si id_centrale non renseigne, alors argc[3] = "" 
 
 
 
 end_time=$(date +%s)
 
 elapsed=$((end_time - start_time))
+echo "Traitement terminé"
 echo "Temps écoulé : $elapsed secondes"

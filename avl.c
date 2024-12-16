@@ -45,9 +45,17 @@ Station* findStation(Node* root, unsigned long id) {
     }
     return findStation(root->leftChild, id);
 }
+
 void printTree(Node* root) {
     if (root == NULL) return;
     printTree(root->leftChild);
     printStation(root->station);
     printTree(root->rightChild);
+}
+
+void freeFullAvl(Node* root) {
+    if (root == NULL) return;
+    freeFullAvl(root->leftChild);
+    freeFullAvl(root->rightChild);
+    free(root);
 }
