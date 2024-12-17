@@ -19,7 +19,7 @@ void output(char* type_station, char* type_conso, char* id_centrale, Node* avl){
         sprintf(nom_fichier, "%s_%s_%s.csv", type_station, type_conso, id_centrale);
     }
     
-    FILE *fichier = fopen(nom_fichier, "w+");
+    fichier = fopen(nom_fichier, "w+");
 
     if(strcmp(type_station, "hvb") == 0){
         fputs("Station HVB:Capacite:Consommation (entreprises)\n", fichier);
@@ -27,11 +27,11 @@ void output(char* type_station, char* type_conso, char* id_centrale, Node* avl){
     else if(strcmp(type_station, "hva") == 0){
         fputs("Station HVA:Capacite:Consommation (entreprises)\n", fichier);
     }
-    if(strcmp(type_station, "lv") == 0){
+    else if(strcmp(type_station, "lv") == 0){
         if(strcmp(type_conso, "comp") == 0){
             fputs("Station LV:Capacite:Consommation (entreprises)\n", fichier);
         }
-        else if(strcmp(type_station, "indiv") == 0){
+        else if(strcmp(type_conso, "indiv") == 0){
             fputs("Station LV:Capacite:Consommation (particuliers)\n", fichier);
         }
         else{
@@ -77,6 +77,7 @@ void parcoursForList(Node* root, Node** result, int* index) {
 // utiliser index pour size
 
 void bubbleSort(Node** result, int size) {
+    if(result == NULL) exit(1);
     for (int i = 0; i < size - 1; i++) {
         for (int j = i + 1; j < size; j++) {
             if (result[i]->station->capacity > result[j]->station->capacity) {
@@ -88,9 +89,10 @@ void bubbleSort(Node** result, int size) {
     }
 }
 
-Node* getList(Node* root) {
+Node** getList(Node* root) {
+    if(root == NULL) exit(1);
     int taille = nombreNoeud(root);
-    Node* result = malloc(taille * sizeof(Node));
+    Node** result = malloc(taille * sizeof(Node*));
     //Node* result[1000];
     int index = 0;
 
@@ -102,9 +104,9 @@ Node* getList(Node* root) {
     return result;
 }
 
-void writeNodeInCSVV2(Node* list, FILE* fichier, int* index) {
-    if (list == NULL) exit(1);
-    for(int i=0; i<*index; i++){
-        fprintf( fichier, "%lu:%llu:%llu\n", list->station->id, list->station->capacity, list->station->totalLoad);
+void writeNodeInCSVV2(Node** list, FILE* fichier, int index) {
+    if (list == NULL || fichier == NULL) exit(1);
+    for(int i=0; i<index; i++){
+        fprintf( fichier, "%lu:%llu:%llu\n", list[i]->station->id, list[i]->station->capacity, list[i]->station->totalLoad);
     }
 }
