@@ -20,6 +20,7 @@ void output(char* type_station, char* type_conso, char* id_centrale, Node* avl){
     }
     
     fichier = fopen(nom_fichier, "w+");
+    if(fichier == NULL) exit(1);
 
     if(strcmp(type_station, "hvb") == 0){
         fputs("Station HVB:Capacite:Consommation (entreprises)\n", fichier);
@@ -39,11 +40,15 @@ void output(char* type_station, char* type_conso, char* id_centrale, Node* avl){
         }
     }
 
-    writeNodeInCSV(avl, fichier);
+    Node** list = getList(avl);
+    int size = nombreNoeud(avl);
+    writeNodeInCSVV2(list, fichier, size);
 
+    free(list);
     fclose(fichier);
 }
 
+// useless mtn
 void writeNodeInCSV(Node* root, FILE* fichier) {
     if (root == NULL) return;
     writeNodeInCSV(root->leftChild, fichier);
@@ -104,6 +109,7 @@ Node** getList(Node* root) {
     return result;
 }
 
+// ecrit chaque noeud dans le csv apres l'entete
 void writeNodeInCSVV2(Node** list, FILE* fichier, int index) {
     if (list == NULL || fichier == NULL) exit(1);
     for(int i=0; i<index; i++){
