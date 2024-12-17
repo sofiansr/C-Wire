@@ -28,8 +28,6 @@ int main(int argc, char** argv) {
     int idCentral = 0;
     if (argc == 4) idCentral = atoi(argv[3]);
 
-    char* stationType = argv[1];
-
     Node* node = NULL;
     if (strcmp(stationType, "hvb") == 0) node = hvbRequest("tmp/tmp.dat");
     else if (strcmp(stationType, "hva") == 0) node = hvaRequest("tmp/tmp.dat");
