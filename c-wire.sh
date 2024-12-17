@@ -125,7 +125,7 @@ then
 fi
 
 # check arg 3 : si id_centrale <= 0 ou n'est pas déclaré (si non renseigné)
-if [ -n $id_centrale ] && [ $id_centrale -le 0 ]
+if [ -n "$id_centrale" ] && [ "$id_centrale" -le 0 ]
 then
     echo ""$id_centrale" <=0 non autorise"
     helpexit
@@ -260,7 +260,7 @@ esac
 
 # ----------- TRAITEMENT -----------
 
-./main "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
+./exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
 # si id_centrale non renseigne, alors argc[3] = "" 
 
 
