@@ -12,6 +12,8 @@ Station* createStation(unsigned long id, unsigned long long capacity, unsigned l
     station->totalLoad = load;
     return station;
 }
+
+
 void printStation(Station* station) {
     if (station == NULL) return;
     printf("[");
