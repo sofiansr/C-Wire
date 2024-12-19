@@ -11,6 +11,13 @@ struct Node {
 };
 
 Node* createNode(Station* station);
+int min(int a, int b);
+int max(int a, int b);
+Node* leftRotate(Node* avl);
+Node* rightRotate(Node* avl);
+Node* doubleLeftRotate(Node* avl);
+Node* doubleRightRotate(Node* avl);
+Node* equilibrateAVL(Node* avl);
 Node* insertStation(Node* root, Station* station, int* h);
 Station* findStation(Node* root, unsigned long id);
 void printTree(Node* root);
