@@ -1,19 +1,16 @@
-all: exec
+CC=gcc
+EXEC=exec
 
-exec: main.o station.o avl.o
-	gcc -o exec main.o station.o avl.o
+all: $(EXEC)
 
-main.o: main.c station.h avl.h
-	gcc -o main.o -c main.c
+exec: main.o station.o avl.o request.o avl.o output.o
+	$(CC) -o $@ $^ 
 
-station.o: station.c station.h
-	gcc -o station.o -c station.c
-
-avl.o: avl.c avl.h station.h
-	gcc -o avl.o -c avl.c
+%.o: %.c %.h
+	$(CC) -o $@ -c $<
 
 clean:
 	rm -f *.o
 
 mrproper: clean
-	rm -f exec
+	rm -f $(EXEC)

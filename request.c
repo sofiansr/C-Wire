@@ -2,6 +2,7 @@
 #include "station.h"
 #include "avl.h"
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 
@@ -38,18 +39,17 @@ FileLine parseLine(char* line) {
 }
 
 Node* hvbRequest(char* tempFilePath) {
-
     FILE* file = fopen(tempFilePath, "r");
     if (file == NULL) {
         exit(1);
     }
 
-    char* line = NULL;
+    char line[100];
     Node* node = NULL;
     int h = 0;
-    while (1) {
-        fgets(line, 100, file);
-        if (line == NULL) break;
+    printf("Parsing file...\n");
+    while (fgets(line, 100, file) != NULL) {
+        // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
         if (fileLine.individualId > 0 || fileLine.lvId > 0 || fileLine.hvaId > 0) {
@@ -59,12 +59,15 @@ Node* hvbRequest(char* tempFilePath) {
         if (station == NULL) {
             station = createStation(fileLine.hvbId, fileLine.capacity, fileLine.load);
             node = insertStation(node, station, &h);
+        } else if (fileLine.capacity > 0) {
+            station->capacity = fileLine.capacity;
         } else {
             station->totalLoad += fileLine.load;
         }
     }
 
     fclose(file);
+    printf("Parsing file done.\n");
     return node;
 }
 
@@ -75,12 +78,11 @@ Node* hvaRequest(char* tempFilePath) {
         exit(1);
     }
 
-    char* line = NULL;
+    char line[100];
     Node* node = NULL;
     int h = 0;
-    while (1) {
-        fgets(line, 100, file);
-        if (line == NULL) break;
+    while (fgets(line, 100, file) != NULL) {
+        // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
         if (fileLine.companyId > 0 || fileLine.lvId > 0) {
@@ -90,6 +92,8 @@ Node* hvaRequest(char* tempFilePath) {
         if (station == NULL) {
             station = createStation(fileLine.hvaId, fileLine.capacity, fileLine.load);
             node = insertStation(node, station, &h);
+        } else if (fileLine.capacity > 0) {
+            station->capacity = fileLine.capacity;
         } else {
             station->totalLoad += fileLine.load;
         }
@@ -106,12 +110,11 @@ Node* lvRequest(char* tempFilePath, ConsumerType type) {
         exit(1);
     }
 
-    char* line = NULL;
+    char line[100];
     Node* node = NULL;
     int h = 0;
-    while (1) {
-        fgets(line, 100, file);
-        if (line == NULL) break;
+    while (fgets(line, 100, file) != NULL) {
+        // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
         if (fileLine.companyId > 0 && type == INDIV) continue;
@@ -121,7 +124,9 @@ Node* lvRequest(char* tempFilePath, ConsumerType type) {
         if (station == NULL) {
             station = createStation(fileLine.lvId, fileLine.capacity, fileLine.load);
             node = insertStation(node, station, &h);
-        } else {
+        } else if (fileLine.capacity > 0) {
+            station->capacity = fileLine.capacity;
+         } else {
             station->totalLoad += fileLine.load;
         }
     }

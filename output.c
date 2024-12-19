@@ -2,21 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 #include "avl.h"
+#include "output.h"
 
-void output(char* type_station, char* type_conso, char* id_centrale, Node* avl){
+void output(char* type_station, char* type_conso, int id_centrale, Node* avl){
     FILE* fichier = NULL;
     char nom_fichier[50]; // tmp
 
-    if(type_station == NULL || type_conso == NULL || id_centrale == NULL || avl == NULL){
+    if(type_station == NULL || type_conso == NULL || avl == NULL){
         exit(1);
     }
 
     // fichier = fopen("test.txt", "r+");
-    if(strcmp(id_centrale, "") == 0){
+    if(id_centrale == 0){
         sprintf(nom_fichier, "%s_%s.csv", type_station, type_conso);
-    }
-    else{
-        sprintf(nom_fichier, "%s_%s_%s.csv", type_station, type_conso, id_centrale);
+    } else {
+        sprintf(nom_fichier, "%s_%s_%d.csv", type_station, type_conso, id_centrale);
     }
     
     fichier = fopen(nom_fichier, "w+");
