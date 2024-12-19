@@ -260,17 +260,24 @@ esac
 
 
 
-# ----------- TRAITEMENT -----------
+# ----------- TRAITEMENT & SORTIE -----------
 
 ./exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
 # si id_centrale non renseigne, alors argc[3] = "" 
 
-output_name=""$type_station"_"$type_consommateur".csv"
-(head -n 1 "$output_name" && tail -n +2 data.txt | sort -t\; -k2 -n) > "$output_name"
+if [ $# -eq 4 ]
+then
+    output_name=""$type_station"_"$type_consommateur"_"$id_centrale".csv"
+    (head -n 1 tmp_final.csv && tail -n +2 tmp_final.csv | sort -t: -k2 -n) > "$output_name"
+else
+    output_name=""$type_station"_"$type_consommateur".csv"
+    (head -n 1 tmp_final.csv && tail -n +2 tmp_final.csv | sort -t: -k2 -n) > "$output_name"
+fi
+
 
 
 end_time=$(date +%s)
-
 elapsed=$((end_time - start_time))
+
 echo "Traitement terminé"
 echo "Temps écoulé : $elapsed secondes"

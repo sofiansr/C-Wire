@@ -20,7 +20,7 @@ void output(char* type_station, char* type_conso, int id_centrale, Node* avl){
         sprintf(nom_fichier, "%s_%s_%d.csv", type_station, type_conso, id_centrale);
     }
     
-    fichier = fopen(nom_fichier, "w+");
+    fichier = fopen("tmp_final.csv", "w+");
     if(fichier == NULL) exit(1);
 
     if(strcmp(type_station, "hvb") == 0){
@@ -54,7 +54,6 @@ void output(char* type_station, char* type_conso, int id_centrale, Node* avl){
     fclose(fichier);
 }
 
-// useless mtn
 void writeNodeInCSV(Node* root, FILE* fichier) {
     if (root == NULL) return;
     writeNodeInCSV(root->leftChild, fichier);
@@ -65,7 +64,8 @@ void writeNodeInCSV(Node* root, FILE* fichier) {
     writeNodeInCSV(root->rightChild, fichier);
 }
 
-// -----------------------
+
+// ----------------------- EN BAS = USELESS 
 
 // l'idée : parcourir l'avl, mettre tout dans une liste, trier cette liste par capacité croissante, l'utiliser pour l'output
 
