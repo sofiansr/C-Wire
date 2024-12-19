@@ -12,7 +12,8 @@ void output(char* type_station, char* type_conso, int id_centrale, Node* avl){
         exit(1);
     }
 
-    // fichier = fopen("test.txt", "r+");
+    int minmax = 0;
+
     if(id_centrale == 0){
         sprintf(nom_fichier, "%s_%s.csv", type_station, type_conso);
     } else {
@@ -36,6 +37,7 @@ void output(char* type_station, char* type_conso, int id_centrale, Node* avl){
             fputs("Station LV:Capacite:Consommation (particuliers)\n", fichier);
         }
         else{
+            minmax = 1;
             fputs("Station LV:Capacite:Consommation (tous)\n", fichier);
         }
     }
@@ -98,6 +100,7 @@ Node** getList(Node* root) {
     if(root == NULL) exit(1);
     int taille = nombreNoeud(root);
     Node** result = malloc(taille * sizeof(Node*));
+    if(result == NULL) exit(1);
     //Node* result[1000];
     int index = 0;
 

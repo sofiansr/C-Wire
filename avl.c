@@ -70,6 +70,7 @@ Node* equilibrateAVL(Node* avl){
             return doubleRightRotate(avl);
         }
     }
+    return avl;
 }
 
 Node* insertStation(Node* root, Station* station, int* h) {
@@ -89,9 +90,9 @@ Node* insertStation(Node* root, Station* station, int* h) {
     }
 
     if (*h != 0) {
-        new->balance += *h;
-        // new = equilibrateAVL(new)
-        if (new->balance == 0) *h = 0;
+        root->balance += *h;
+        root = equilibrateAVL(root);
+        if (root->balance == 0) *h = 0;
         else *h = 1;
     }
     return root;
