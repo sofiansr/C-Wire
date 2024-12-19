@@ -42,11 +42,15 @@ void output(char* type_station, char* type_conso, int id_centrale, Node* avl){
         }
     }
 
+    writeNodeInCSV(avl, fichier);
+
+    /*
     Node** list = getList(avl);
     int size = nombreNoeud(avl);
     writeNodeInCSVV2(list, fichier, size);
 
     free(list);
+    */
     fclose(fichier);
 }
 

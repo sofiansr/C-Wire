@@ -265,6 +265,8 @@ esac
 ./exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
 # si id_centrale non renseigne, alors argc[3] = "" 
 
+output_name=""$type_station"_"$type_consommateur".csv"
+(head -n 1 "$output_name" && tail -n +2 data.txt | sort -t\; -k2 -n) > "$output_name"
 
 
 end_time=$(date +%s)
