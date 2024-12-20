@@ -1,8 +1,6 @@
 #!/bin/bash
 
-#file='c-wire_v00.dat'
-
-# affiche l'aide si demandé ou si args incorrects puis exit
+# Shows help if asked or if any argument is incorrect
 helpexit(){
     message="
     _____       _    _ ___________ _____ 
@@ -41,7 +39,7 @@ helpexit(){
     exit 1
 }
 
-# Vérifier si l'un des paramètres est -h
+# Check if any of the arguments is "-h"
 for arg in "$@"
 do
     if [ "$arg" == "-h" ]; then
@@ -51,17 +49,17 @@ done
 
 
 
-# ----------- ROBUSTESSE -----------
+# ----------- ROBUSTNESS -----------
 
-# rappel, 3 arguments (4)
-# arg 1 : file_path = chemin du fichier
-# arg 2 : type_station = type de station (= hvb/hva/lv)
-# arg 3 : type_consommateur = type consommateur (=comp/indiv/all)
-# (arg 4 : id_centrale = filtre les résultats pour une centrale spécifique (>=1))
+# REMINDER, 3 arguments (4)
+# arg 1 : file_path = file path
+# arg 2 : type_station = station type (= hvb/hva/lv)
+# arg 3 : type_consommateur = consumer type (=comp/indiv/all)
+# (arg 4 : id_centrale = filter results for a specific power plant (>=1))
 
 if [ $# -eq 0 ]
 then
-    echo "Aucun argument passé en paramètre"
+    echo "No arguments given"
     helpexit
 fi
 
@@ -73,69 +71,69 @@ type_consommateur=$3
 # check arg 1 : file existe dans dossier courant ?
 if [ ! -e $file_path ]
 then
-    echo "fichier "$file_path" non présent dans le dossier courant"
+    echo ""$file_path" file not found in the current directory"
     helpexit
 fi
 
-# test fichier vide
+# empty file test
 if [ ! -s "$file_path" ]
 then
-    echo "fichier "$file_path" vide"
+    echo ""$file_path" file empty"
     helpexit
 fi
 
-# test perm lecture
+# read access test
 if [ ! -r $file_path ]
 then
-    echo "pas d'acces en lecture au fichier "$file_path""
+    echo "no read access to "$file_path" file"
     helpexit
 fi
 
 # check arg 2
 if [ "$type_station" != "hvb" ] && [ "$type_station" != "hva" ] && [ "$type_station" != "lv" ]
 then
-    echo ""$type_station" est un mauvais argument pour le deuxieme argument (hvb/hva/lv)"
+    echo ""$type_station" is a bad argument for 2nd argument (hvb/hva/lv)"
     helpexit
 fi
 
 # check arg 3
 if [ "$type_consommateur" != "comp" ] && [ "$type_consommateur" != "indiv" ] && [ "$type_consommateur" != "all" ]
 then
-    echo ""$type_consommateur" est un mauvais argument pour le troisieme argument (comp/indiv/all)"
+    echo ""$type_consommateur" is a bad argument for 3rd argument (comp/indiv/all)"
     helpexit
 fi
 
-# verif si 4 arguments pour attrib id_centrale
+# check if 4 arguments to declare id_centrale if so
 if [ $# -eq 4 ]
 then
-    id_centrale=$(($4))             # conversion en int
+    id_centrale=$(($4))             # int conversion
     if (( $id_centrale <= 0 ))
     then
-        echo "id_centrale <= 0 : incorrect"
+        echo "id_centrale <= 0 is not allowed"
         helpexit
     fi
 fi
 
-# vérif des cas interdits arg 2 et 3
+# checking for forbidden case for arg 2 and arg 3
 if [[ ( "$type_station" == "hvb" || "$type_station" == "hva" ) && 
       ( "$type_consommateur" == "all" || "$type_consommateur" == "indiv" ) ]]
 then
-    echo "argument "$type_station" et argument "$type_consommateur" incompatible"
+    echo ""$type_station" argument and "$type_consommateur" argument incompatible"
     helpexit
 fi
 
-# check arg 3 : si id_centrale <= 0 ou n'est pas déclaré (si non renseigné)
+# check arg 3 : if id_centrale <= 0 ou is not declarated
 if [ -n "$id_centrale" ] && [ "$id_centrale" -le 0 ]
 then
-    echo ""$id_centrale" <=0 non autorise"
+    echo ""$id_centrale" <=0 is not allowed"
     helpexit
 fi
 
 
-# ----------- COMPILATION & DOSSIERS -----------
+# ----------- COMPILATION & FOLDERS -----------
 
-# EXECUTABLE NON PRESENT DANS DOSSIER COURANT :
-# make renvoie 0 si ok, autre chose sinon
+# EXECUTABLE NOT IN FOLDER :
+# make return 0 if ok, other otherwise 
 if [ ! -e "exec" ]
 then
     if make
@@ -147,7 +145,7 @@ then
     fi
 fi
 
-# verif dossier tmp existe, le creer sinon, et le vider s'il existe deja
+# checks if tmp folder exists, empty it, or create it otherwise
 if [ -d "tmp" ]
 then
     rm -rf tmp
@@ -158,52 +156,34 @@ fi
 
 
 
-# ----------- FILTRAGE -----------
+# ----------- DATA FILTERING -----------
 
-# le filtrage est chronometre : le code du filtrage est entre start_time et end_time
+# filtering is timed : filtering code is between start_time and end_time
 
 start_time=$(date +%s)
 
-echo "RAPPEL filtrage demande : "$type_station" "$type_consommateur""
+echo "REMINDER filtering asked : "$type_station" "$type_consommateur""
 
-echo "debut filtrage : veuillez patienter"
-
-# if [ "$type_station" == "" ]
-
-# awk -F ';' 
-# doc awk : https://www.funix.org/fr/unix/awk.htm
-
-# Lorsque le script demande un type de station (hvb, hva, lv), le but final
-# sera de créer un fichier contenant une liste de ces stations avec la valeur
-# de capacité (la quantité d’énergie qu’elle peut laisser passer) et la somme
-# des consommateurs branchés directement dessus.
-
-# (conso) || (capacite)
+echo "Filtrage started : please wait..."
 
 case $type_station in
     hvb)
         if [ -z "$id_centrale" ]
         then
-            # COMP sans id_centrale
-            # conso : awk -F ';' '$2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
-            # capacite : awk -F ';' '$2 != "-" && $3 == "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"' "$file_path" > "tmp/tmp.dat"
+            # COMP without id_centrale
             awk -F ';' '($2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 != "-" && $3 == "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
         else
-            # COMP avec id_centrale
-            # awk -F ';' -v id="$id_centrale" '$1 == id && $2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+            # COMP with id_centrale
             awk -F ';' -v id="$id_centrale" '$1 == id && (($2 != "-" && $3 == "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 != "-" && $3 == "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
         fi
         ;;
     hva)
         if [ -z "$id_centrale" ]
         then
-            # COMP sans id_centrale
-            # awk -F ';' '$3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
-            # awk -F ';' '$3 != "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"' "$file_path" > "tmp/tmp.dat"
+            # COMP without id_centrale
             awk -F ';' '($3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($3 != "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
         else
-            # COMP avec id_centrale
-            # awk -F ';' -v id="$id_centrale" '$1 == id && $3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+            # COMP with id_centrale
             awk -F ';' -v id="$id_centrale" '$1 == id && (($3 != "-" && $4 == "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($3 != "-" && $4 == "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
         fi
         ;;
@@ -212,58 +192,53 @@ case $type_station in
             comp)
                 if [ -z "$id_centrale" ]
                 then
-                    # COMP sans id_centrale
-                    # awk -F ';' '$2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
-                    # awk -F ';' '$2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-"' "$file_path" > "tmp/tmp.dat"
-                    # awk -F ';' '($2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
+                    # COMP without id_centrale
                     awk -F ';' '($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 != "-") || ($2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-" && $8 != "-")' "$file_path" > "tmp/tmp.dat"
                 else
-                    # COMP avec id_centrale
-                    # awk -F ';' -v id="$id_centrale" '$1 == id && $2 == "-" && $3 != "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    # COMP with id_centrale
                     awk -F ';' -v id="$id_centrale" '$1 == id && (($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 != "-") || ($2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-" && $8 != "-"))' "$file_path" > "tmp/tmp.dat"
                 fi
                 ;;
             indiv)
                 if [ -z "$id_centrale" ]
                 then
-                    # INDIV sans id_centrale
-                    # awk -F ';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    # INDIV without id_centrale
                     awk -F ';' '($2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
                 else
-                    # INDIV avec id_centrale
-                    # awk -F ';' -v id="$id_centrale" '$1 == id && $2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    # INDIV with id_centrale
                     awk -F ';' -v id="$id_centrale" '$1 == id && (($2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-"))' "$file_path" > "tmp/tmp.dat"
                 fi
                 ;;
             all)
                 if [ -z "$id_centrale" ]
                 then
-                    # ALL sans id_centrale
-                    # awk -F ';' '$2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-"' "$file_path" > "tmp/tmp.dat"
-                    # awk -F ';' '($2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-") || ($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 == "-" && $8 == "-")' "$file_path" > "tmp/tmp.dat"
+                    # ALL without id_centrale
                     awk -F ';' '($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-") || ($2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-" && $8 != "-") || ($2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-")' "$file_path" > "tmp/tmp.dat"
                 else
-                    # ALL avec id_centrale
-                    # awk -F ';' -v id="$id_centrale" '$1 == id && $2 == "-" && $3 == "-" && $4 != "-" && (($5 == "-" && $6 != "-") || ($5 != "-" && $6 == "-")) && $7 == "-"' "$file_path" > "tmp/tmp.dat"
+                    # ALL with id_centrale
                     awk -F ';' -v id="$id_centrale" '$1 == id && (($2 == "-" && $3 != "-" && $4 != "-" && $5 == "-" && $6 == "-" && $7 != "-" && $8 == "-") || ($2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $7 == "-" && $8 != "-") || ($2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $7 == "-"))' "$file_path" > "tmp/tmp.dat"
                 fi
                 ;;
             *)
-                # en theorie on arrive jamais ici
                 ;;
         esac
         ;;
     *)
-        # idem
         ;;
 esac
 
+# Testing awk return code
+if [ $? -ne 0 ]
+then
+    echo "awk error"
+    exit 1
+fi
 
 
-# ----------- TRAITEMENT & SORTIE -----------
+# ----------- DATA PROCESSING & OUTPUT -----------
 
 ./exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
-# si id_centrale non renseigne, alors argc[3] = "" 
+# if id_centrale not given, then argc[3] = "" 
 
 if [ $# -eq 4 ]
 then
@@ -274,10 +249,32 @@ else
     (head -n 1 tmp_final.csv && tail -n +2 tmp_final.csv | sort -t: -k2 -n) > "$output_name"
 fi
 
+# Testing sort return code
+if [ $? -ne 0 ]
+then
+    echo "sort error"
+    exit 1
+fi
 
+# lv all case : creating "lv_all_minmax.csv"
+if [ "$type_station" == "lv" ] && [ "$type_consommateur" == "all" ]
+then
+    {
+  head -n 1 tmp_final.csv
+  tail -n +2 tmp_final.csv | sort -t: -k3 -n | tail -n 10
+  tail -n +2 tmp_final.csv | sort -t: -k3 -n | head -n 10
+    } > "lv_all_minmax.csv"
+fi
+
+# Testing sort return code
+if [ $? -ne 0 ]
+then
+    echo "sort error"
+    exit 1
+fi
 
 end_time=$(date +%s)
 elapsed=$((end_time - start_time))
 
-echo "Traitement terminé"
-echo "Temps écoulé : $elapsed secondes"
+echo "Data processing finished"
+echo "Elapsed time : $elapsed seconds"
