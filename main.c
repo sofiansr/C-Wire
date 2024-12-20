@@ -32,18 +32,14 @@ int main(int argc, char** argv) {
     int idCentral = 0;
     if (argc == 4) {
         idCentral = atoi(argv[4]);
-        printf("Id central trouvé !\n");
-    } else {
-        printf("Pas d'id central renseigné.\n");
     }
     char* stationType = argv[2];
     Node* node = NULL;
 
-    if (strcmp(stationType, "hvb") == 0) node = hvbRequest("tmp/tmp.dat");
-    else if (strcmp(stationType, "hva") == 0) node = hvaRequest("tmp/tmp.dat");
-    else if (strcmp(stationType, "lv") == 0) node = lvRequest("tmp/tmp.dat", type);
+    if (strcmp(stationType, "hvb") == 0) node = hvbRequest(argv[1]);
+    else if (strcmp(stationType, "hva") == 0) node = hvaRequest(argv[1]);
+    else if (strcmp(stationType, "lv") == 0) node = lvRequest(argv[1], type);
     else exit(1);
-    printTree(node);
 
     // output
 

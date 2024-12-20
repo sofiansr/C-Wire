@@ -56,3 +56,4 @@ exec
 .vscode/c_cpp_properties.json
 *.csv
 tmp/
+c-wire_v25.dat

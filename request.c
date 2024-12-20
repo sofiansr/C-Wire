@@ -52,6 +52,7 @@ Node* hvbRequest(char* tempFilePath) {
         // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
+        if (fileLine.hvaId != 0) continue;
         if (fileLine.individualId > 0 || fileLine.lvId > 0 || fileLine.hvaId > 0) {
             continue;
         }
@@ -85,6 +86,7 @@ Node* hvaRequest(char* tempFilePath) {
         // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
+        if (fileLine.lvId != 0) continue;
         if (fileLine.companyId > 0 || fileLine.lvId > 0) {
             continue;
         }
@@ -117,6 +119,7 @@ Node* lvRequest(char* tempFilePath, ConsumerType type) {
         // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
+        if (fileLine.lvId == 0) continue;
         if (fileLine.companyId > 0 && type == INDIV) continue;
         if (fileLine.individualId > 0 && type == COMP) continue;
         
