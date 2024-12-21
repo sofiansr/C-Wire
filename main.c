@@ -5,46 +5,59 @@
 #include "request.h"
 #include "output.h"
 
-void checkArgs(int argc, char** argv) {
-
-}
-
+/**
+ * @brief Entry point of the program.
+ *
+ * The program processes input arguments to perform operations on an AVL tree 
+ * based on the type of station, consumer, and optionally, a specific station ID.
+ *
+ * @param argc Number of command-line arguments.
+ * @param argv Array of command-line arguments.
+ *        - argv[0]: Executable path
+ *        - argv[1]: File path
+ *        - argv[2]: Station type ("hvb", "hva", or "lv")
+ *        - argv[3]: Consumer type ("comp", "indiv", or "all")
+ *        - argv[4] (optional): Central station ID
+ * @return 0 on success, exits with an error code on failure.
+ */
 int main(int argc, char** argv) {
-    // argc[1] = chemin du fichier
-    // argc[2] = type de station
-    // argc[3] = type de consommateur
-    // argc[4] = id_centrale (optionnel)
-
+    // Check if the required number of arguments is provided
     if (argc < 4) {
-        exit(1);
+        exit(1); // Exit if not enough arguments
     }
-    printf("Nombre d'arguments: %d\n", argc);
-    printf("Arguments: %s %s %s\n", argv[1], argv[2], argv[3]);
-    
+
+    // Parse the consumer type
     ConsumerType type = 0;
     char* consumerType = argv[3];
-    printf("Type de consommateur: %s\n", consumerType);
-    if (strcmp(consumerType, "comp") == 0) type = COMP;
-    else if (strcmp(consumerType, "indiv") == 0) type = INDIV;
-    else if (strcmp(consumerType, "all") == 0) type = ALL;
-    else exit(1);
+    printf("Consumer type: %s\n", consumerType);
+    if (strcmp(consumerType, "comp") == 0) type = COMP;         // Company
+    else if (strcmp(consumerType, "indiv") == 0) type = INDIV;  // Individual
+    else if (strcmp(consumerType, "all") == 0) type = ALL;      // All consumers
+    else exit(1); // Exit if the consumer type is invalid
 
-    int idCentral = 0;
-    if (argc == 4) {
-        idCentral = atoi(argv[4]);
-    }
+    // Parse the power station ID if provided
+    int powerStation = 0;
+    if (argc > 4) powerStation = atoi(argv[4]); // Convert the argument to an integer
+
+    // Parse the station type
     char* stationType = argv[2];
     Node* node = NULL;
 
-    if (strcmp(stationType, "hvb") == 0) node = hvbRequest(argv[1]);
-    else if (strcmp(stationType, "hva") == 0) node = hvaRequest(argv[1]);
-    else if (strcmp(stationType, "lv") == 0) node = lvRequest(argv[1], type);
-    else exit(1);
+    // Handle requests based on the station type
+    if (strcmp(stationType, "hvb") == 0) { 
+        node = hvbRequest(argv[1], powerStation); // High Voltage Bus request
+    } else if (strcmp(stationType, "hva") == 0) { 
+        node = hvaRequest(argv[1], powerStation); // High Voltage Alternating request
+    } else if (strcmp(stationType, "lv") == 0) { 
+        node = lvRequest(argv[1], type, powerStation); // Low Voltage request
+    } else {
+        exit(1); // Exit if the station type is invalid
+    }
 
-    // output
+    // Generate the output based on the processed data
+    output(stationType, consumerType, powerStation, node);
 
-    output(stationType, consumerType, idCentral, node);
-
+    // Free the memory used by the AVL tree
     freeFullAvl(node);
 
     return 0;

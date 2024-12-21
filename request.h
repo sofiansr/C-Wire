@@ -11,8 +11,8 @@ typedef enum ConsumerType {
     INDIV
 } ConsumerType;
 
-Node* hvbRequest(char* tempFilePath);
-Node* hvaRequest(char* tempFilePath);
-Node* lvRequest(char* tempFilePath, ConsumerType type);
+Node* hvbRequest(char* tempFilePath, int power_plant);
+Node* hvaRequest(char* tempFilePath, int power_plant);
+Node* lvRequest(char* tempFilePath, ConsumerType type, int power_plant);
 
 #endif

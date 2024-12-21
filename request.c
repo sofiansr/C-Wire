@@ -7,7 +7,7 @@
 
 
 typedef struct {
-    unsigned long power_plant; // 5 centrales
+    int power_plant; // 5 centrales
     unsigned long hvbId; // ~118 sous-stations HV-B
     unsigned long hvaId; // ~512 sous-stations HV-A
     unsigned long lvId; // +180k postes LV
@@ -20,7 +20,7 @@ typedef struct {
 FileLine parseLine(char* line) {
     FileLine fileLine;
     char* token = strtok(line, ";");
-    fileLine.power_plant = strtoul(token, NULL, 10); // 5 centrales
+    fileLine.power_plant = atoi(token); // 5 centrales
     token = strtok(NULL, ";");
     fileLine.hvbId = strtoul(token, NULL, 10); // ~118 sous-stations HV-B
     token = strtok(NULL, ";");
@@ -38,7 +38,7 @@ FileLine parseLine(char* line) {
     return fileLine;
 }
 
-Node* hvbRequest(char* tempFilePath) {
+Node* hvbRequest(char* tempFilePath, int power_plant) {
     FILE* file = fopen(tempFilePath, "r");
     if (file == NULL) {
         exit(1);
@@ -47,7 +47,6 @@ Node* hvbRequest(char* tempFilePath) {
     char line[100];
     Node* node = NULL;
     int h = 0;
-    printf("Parsing file...\n");
     while (fgets(line, 100, file) != NULL) {
         // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
@@ -56,6 +55,7 @@ Node* hvbRequest(char* tempFilePath) {
         if (fileLine.individualId > 0 || fileLine.lvId > 0 || fileLine.hvaId > 0) {
             continue;
         }
+        if (power_plant > 0 && fileLine.power_plant != power_plant) continue;
         Station* station = findStation(node, fileLine.hvbId);
         if (station == NULL) {
             station = createStation(fileLine.hvbId, fileLine.capacity, fileLine.load);
@@ -68,11 +68,10 @@ Node* hvbRequest(char* tempFilePath) {
     }
 
     fclose(file);
-    printf("Parsing file done.\n");
     return node;
 }
 
-Node* hvaRequest(char* tempFilePath) {
+Node* hvaRequest(char* tempFilePath, int power_plant) {
 
     FILE* file = fopen(tempFilePath, "r");
     if (file == NULL) {
@@ -90,6 +89,8 @@ Node* hvaRequest(char* tempFilePath) {
         if (fileLine.companyId > 0 || fileLine.lvId > 0) {
             continue;
         }
+
+        if (power_plant > 0 && fileLine.power_plant != power_plant) continue;
         Station* station = findStation(node, fileLine.hvaId);
         if (station == NULL) {
             station = createStation(fileLine.hvaId, fileLine.capacity, fileLine.load);
@@ -105,7 +106,7 @@ Node* hvaRequest(char* tempFilePath) {
     return node;
 }
 
-Node* lvRequest(char* tempFilePath, ConsumerType type) {
+Node* lvRequest(char* tempFilePath, ConsumerType type, int power_plant) {
 
     FILE* file = fopen(tempFilePath, "r");
     if (file == NULL) {
@@ -122,6 +123,8 @@ Node* lvRequest(char* tempFilePath, ConsumerType type) {
         if (fileLine.lvId == 0) continue;
         if (fileLine.companyId > 0 && type == INDIV) continue;
         if (fileLine.individualId > 0 && type == COMP) continue;
+
+        if (power_plant > 0 && fileLine.power_plant != power_plant) continue;
         
         Station* station = findStation(node, fileLine.lvId);
         if (station == NULL) {

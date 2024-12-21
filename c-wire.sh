@@ -146,13 +146,10 @@ then
 fi
 
 # checks if tmp folder exists, empty it, or create it otherwise
-if [ -d "tmp" ]
-then
+if [ -d "tmp" ] ; then
     rm -rf tmp
-    mkdir tmp
-else
-    mkdir tmp
 fi
+mkdir tmp
 
 
 
@@ -165,16 +162,34 @@ start_time=$(date +%s)
 
 # ----------- DATA PROCESSING & OUTPUT -----------
 
+output_folder="output"
+
 ./exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
-# if id_centrale not given, then argc[3] = "" 
+# if id_centrale not given, then argc[3] = ""
+
+# Testing program return code
+
+case $? in
+    10)
+        echo "No data found error"
+        exit 1
+        ;;
+    0)
+        echo "C Program successfully executed, waiting for sorting..."
+        ;;
+    *)
+        echo "Error code in C program "$?
+        exit 1
+        ;;
+esac
 
 if [ $# -eq 4 ]
 then
     output_name=""$type_station"_"$type_consommateur"_"$id_centrale".csv"
-    (head -n 1 tmp_final.csv && tail -n +2 tmp_final.csv | sort -t: -k2 -n) > "$output_name"
+    (head -n 1 tmp/tmp_final.csv && tail -n +2 tmp/tmp_final.csv | sort -t: -k2 -n) > "$output_folder/$output_name"
 else
     output_name=""$type_station"_"$type_consommateur".csv"
-    (head -n 1 tmp_final.csv && tail -n +2 tmp_final.csv | sort -t: -k2 -n) > "$output_name"
+    (head -n 1 tmp/tmp_final.csv && tail -n +2 tmp/tmp_final.csv | sort -t: -k2 -n) > "$output_folder/$output_name"
 fi
 
 # Testing sort return code
@@ -188,10 +203,10 @@ fi
 if [ "$type_station" == "lv" ] && [ "$type_consommateur" == "all" ]
 then
     {
-  head -n 1 tmp_final.csv
-  tail -n +2 tmp_final.csv | sort -t: -k3 -n | tail -n 10
-  tail -n +2 tmp_final.csv | sort -t: -k3 -n | head -n 10
-    } > "lv_all_minmax.csv"
+  head -n 1 tmp/tmp_final.csv
+  tail -n +2 tmp/tmp_final.csv | sort -t: -k3 -n | tail -n 10
+  tail -n +2 tmp/tmp_final.csv | sort -t: -k3 -n | head -n 10
+    } > "${output_folder}/lv_all_minmax.csv"
 fi
 
 # Testing sort return code
