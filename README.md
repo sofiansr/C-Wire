@@ -43,6 +43,9 @@ where
 > [!WARNING]
 > The data file should be in `/input` for C-WIRE to work.
 
+> [!TIP]
+> `-h` for any of the arguments will show C-WIRE help.
+
 ## C-WIRE output
 
 Depending on the combination you choose, a `.CSV` output file will be created in the `/tests` folder. The latter is sorted by ascending electric capacity.
