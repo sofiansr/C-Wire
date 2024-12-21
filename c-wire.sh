@@ -151,6 +151,12 @@ if [ -d "tmp" ] ; then
 fi
 mkdir tmp
 
+# checks if output folder exists, empty it, or create it otherwise
+if [ -d "output" ] ; then
+    rm -rf output
+fi
+mkdir output
+
 
 
 # ----------- DATA FILTERING -----------
