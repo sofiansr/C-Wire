@@ -13,7 +13,7 @@
 
 <p align='center'>
     C-Wire is a command-line script that sort your electricity distribution system by station type and user type.<br>
-    Results are sorted by electric capacity in a `.csv` file.
+    Results are sorted by electric capacity in a .csv file.
 </p>
 
 ## Installation and running
