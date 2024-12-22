@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     // Parse the consumer type
     ConsumerType type = 0;
     char* consumerType = argv[3];
-    printf("Consumer type: %s\n", consumerType);
+    
     if (strcmp(consumerType, "comp") == 0) type = COMP;         // Company
     else if (strcmp(consumerType, "indiv") == 0) type = INDIV;  // Individual
     else if (strcmp(consumerType, "all") == 0) type = ALL;      // All consumers

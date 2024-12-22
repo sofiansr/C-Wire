@@ -153,17 +153,13 @@ if [ -d "tmp" ] ; then
     rm -rf tmp
 fi
 mkdir -p tmp
+mkdir -p tests
 
 # checks if output folder exists, empty it, or create it otherwise
 if [ -d "output" ] ; then
-    rm -rf output
+    mv output/* tests/
 fi
 mkdir -p output
-
-mkdir -p tests
-cd output
-mv *.csv ../
-mv *.csv tests/
 
 # ----------- DATA FILTERING -----------
 
