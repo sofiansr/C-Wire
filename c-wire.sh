@@ -134,6 +134,7 @@ fi
 
 # EXECUTABLE NOT IN FOLDER :
 # make return 0 if ok, other otherwise 
+cd codeC
 if [ ! -e "exec" ]
 then
     if make
@@ -145,19 +146,24 @@ then
     fi
 fi
 
+cd ..
+
 # checks if tmp folder exists, empty it, or create it otherwise
 if [ -d "tmp" ] ; then
     rm -rf tmp
 fi
-mkdir tmp
+mkdir -p tmp
 
 # checks if output folder exists, empty it, or create it otherwise
 if [ -d "output" ] ; then
     rm -rf output
 fi
-mkdir output
+mkdir -p output
 
-
+mkdir -p tests
+cd output
+mv *.csv ../
+mv *.csv tests/
 
 # ----------- DATA FILTERING -----------
 
@@ -170,7 +176,7 @@ start_time=$(date +%s)
 
 output_folder="output"
 
-./exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
+codeC/exec "$file_path" "$type_station" "$type_consommateur" "$id_centrale"
 # if id_centrale not given, then argc[3] = ""
 
 # Testing program return code
