@@ -64,7 +64,7 @@ then
 fi
 
 # récupération des arguments :
-file_path=$1
+file_path=input/$1
 type_station=$2
 type_consommateur=$3
 
