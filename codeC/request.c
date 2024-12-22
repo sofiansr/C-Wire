@@ -48,7 +48,6 @@ Node* hvbRequest(char* tempFilePath, int power_plant) {
     Node* node = NULL;
     int h = 0;
     while (fgets(line, 100, file) != NULL) {
-        // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
         if (fileLine.hvaId != 0) continue;
@@ -82,7 +81,6 @@ Node* hvaRequest(char* tempFilePath, int power_plant) {
     Node* node = NULL;
     int h = 0;
     while (fgets(line, 100, file) != NULL) {
-        // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
         if (fileLine.lvId != 0) continue;
@@ -117,7 +115,6 @@ Node* lvRequest(char* tempFilePath, ConsumerType type, int power_plant) {
     Node* node = NULL;
     int h = 0;
     while (fgets(line, 100, file) != NULL) {
-        // TODO: handle error of parsing if invalid line format, maybe just skip the line
         FileLine fileLine = parseLine(line);
 
         if (fileLine.lvId == 0) continue;
