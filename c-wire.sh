@@ -211,10 +211,14 @@ fi
 if [ "$type_station" == "lv" ] && [ "$type_consommateur" == "all" ]
 then
     {
-  head -n 1 tmp/tmp_final.csv
-  tail -n +2 tmp/tmp_final.csv | sort -t: -k3 -n | tail -n 10
-  tail -n +2 tmp/tmp_final.csv | sort -t: -k3 -n | head -n 10
-    } > "${output_folder}/lv_all_minmax.csv"
+    head -n 1 tmp/tmp_final.csv
+    tail -n +2 tmp/tmp_final.csv | sort -t: -k3 -n | tail -n 10
+    tail -n +2 tmp/tmp_final.csv | sort -t: -k3 -n | head -n 10
+    } > "${output_folder}/lv_all_minmax_${id_centrale}.csv"
+    if [ -z "$id_centrale" ] ; then
+    mv "${output_folder}/lv_all_minmax_.csv" "${output_folder}/lv_all_minmax.csv"
+    fi
+    
 fi
 
 # Testing sort return code
