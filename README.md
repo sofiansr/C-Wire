@@ -28,7 +28,7 @@ git clone https://github.com/raphael950/C-Wire.git
 
 2. Open your terminal where you cloned the repository :
 
-3. Start the software :
+3. Start C-WIRE :
 ```
 bash c-wire.sh [ARG1] [ARG2] [ARG3] ([ARG4])
 ```
@@ -37,7 +37,7 @@ where
 | :-------- | :------- |
 | ARG1 (string)| Data file path |
 | ARG2 (string)| Station type (hvb, hva, lv)|
-| ARG3 (string)| Consumer type (comp, indiv, all |
+| ARG3 (string)| Consumer type (comp, indiv, all) |
 | ARG4 (optional) (int)| Filter the results by a specific power plant ID |
 
 > [!WARNING]
@@ -48,16 +48,16 @@ where
 
 ## C-WIRE output
 
-Depending on the combination you choose, a `.CSV` output file will be created in the `/tests` folder. The latter is sorted by ascending electric capacity.
+Depending on the combination you choose, a `.csv` output file will be created in the `/tests` folder. The latter is sorted by ascending electric capacity.
 For example, `bash c-wire.sh input/data.dat hvb comp` will output a file named `hvb_comp.csv`.
 
 > [!NOTE]
-> Using a power plant ID for `([ARG4])` will add the id after the combination name output.
+> Using a power plant ID for `([ARG4])` will add that ID after the combination name output.
 > For example, `bash c-wire.sh input/data.dat hvb comp 42` will output a file named `hvb_comp_42.csv`.
 
 > [!TIP]
 > In the `lv all` case, C-WIRE will output a second file named `lv_all_minmax.csv`.
-> The latter contains the 10 LV stations with the most consumption and the 10 LV stations with the least consumption.
+> The latter contains the 10 LV stations with the most consumption and the 10 LV stations with the least consumption. The file is sorted by descending electric capacity.
 
 ## Creators
 
