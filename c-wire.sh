@@ -157,7 +157,9 @@ mkdir -p tests
 
 # checks if output folder exists, empty it, or create it otherwise
 if [ -d "output" ] ; then
-    mv output/* tests/
+    if [  "$(ls -A ./output)" ] ; then
+        mv output/* tests/
+    fi
 fi
 mkdir -p output
 
