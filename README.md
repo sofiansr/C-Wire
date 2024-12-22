@@ -12,7 +12,7 @@
 </p>
 
 <p align='center'>
-    C-Wire is a command-line script that sort your electricity distribution system by station type and user type.
+    C-Wire is a command-line script that sort your electricity distribution system by station type and user type.<br>
     Results are sorted by electric capacity in a `.csv` file.
 </p>
 
@@ -48,16 +48,19 @@ where
 
 ## C-WIRE output
 
-Depending on the combination you choose, a `.csv` output file will be created in the `/tests` folder. The latter is sorted by ascending electric capacity.
+Depending on the combination you choose, a `.csv` output file will be created at the root. The latter is sorted by ascending electric capacity.
+
 For example, `bash c-wire.sh input/data.dat hvb comp` will output a file named `hvb_comp.csv`.
+Old `.csv` files will be moved in the `tests` folder.
 
 > [!NOTE]
 > Using a power plant ID for `([ARG4])` will add that ID after the combination name output.
 > For example, `bash c-wire.sh input/data.dat hvb comp 42` will output a file named `hvb_comp_42.csv`.
 
 > [!TIP]
-> In the `lv all` case, C-WIRE will output a second file named `lv_all_minmax.csv`.
-> The latter contains the 10 LV stations with the most consumption and the 10 LV stations with the least consumption. The file is sorted by descending electric capacity.
+> In the `lv all` case (or `lv all ID`), C-WIRE will output a second file named `lv_all_minmax.csv` (or `lv_all_minmax_ID.csv`).
+> The latter contains the 10 LV stations with the most consumption and the 10 LV stations with the least consumption.<br>
+> The file is sorted by descending electric capacity.
 
 ## Creators
 
