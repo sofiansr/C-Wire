@@ -16,6 +16,10 @@
     Results are sorted by electric capacity in a .csv file.
 </p>
 
+## Introduction
+"C-WIRE" is an assignment given by both Eva ANSERMIN and Romuald GRIGNON, two teachers of mine at CY Tech.<br>
+This assignment was due at the end of the first semester of my second year there.<br>
+[See the assignment requirements](https://github.com/sofiansr/C-Wire/blob/main/Project%20report%20C-Wire.pdf)
 ## Installation and running
 
 > [!CAUTION]
